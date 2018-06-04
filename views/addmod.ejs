@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Add/Update Mod</title>
+<%- include('head') %>
+</head>
+<body>
+	<%- include('header') %>
+	<div class="content container addmod-content">
+		<h2 class="display-2">Add/Update Mod</h2><br />
+		<form method="POST" style="width:100%;margin-bottom:20px;">
+			<div class="form-submit-uri">
+				<input type="text" class="addmod-input" autocomplete="off" name="uri" placeholder="URL to mod zip"/>
+				<input type="submit" class="btn btn-primary" style="height:32px;"/>
+			</div>
+		</form>
+		<% if(locals.message){ %>
+			<h4><%- message %></h4>
+		<% } %>
+	</div>
+	<%- include('footer') %>
+</body>
+</html>

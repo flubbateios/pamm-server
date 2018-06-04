@@ -1,0 +1,43 @@
+<nav class="navbar navbar-light bg-primary navbar-expand-lg">
+	<a class="navbar-brand" href="./"><img src="./public/logo.svg" style="width:64px;height:64px"/></a>
+	<ul class="navbar-nav mr-auto">
+		<li class="nav-item">
+			<a class="nav-link" href="./mods">Mod list</a>
+		</li>
+		<% if(gUser){ %>
+		<li class="nav-item">
+			<a class="nav-link" href="./mymods">Your Mods</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" href="./addmod">Add/Update Mod</a>
+		</li>
+		<% if(isAdmin){ %>
+			<li class="nav-item">
+				<a class="nav-link" href="./mods_admin">Manage Mods</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="./ban">Manage Users</a>
+			</li>
+		<% } %>
+		<% if(isOwner){ %>
+			<li class="nav-item">
+				<a class="nav-link" href="./admins">Manage Admins</a>
+			</li>
+		<% } %>
+		<% } %>
+	</ul>
+	<ul class="navbar-nav navbar-right">
+		<% if(!gUser){ %>
+		<li class="nav-item login-link">
+			<a class="nav-link" href="./login">Login</a>
+		</li>
+		<% }else{ %>
+		<li class="nav-item login-link">
+			<a class="nav-link" href="https://github.com/<%= gUser %>" target="_blank"><b><%= gUser %></b></a>
+		</li>
+		<li class="nav-item login-link">
+			<a class="nav-link" href="./logout">Log out</a>
+		</li>
+		<% } %>
+	</ul>
+</nav>

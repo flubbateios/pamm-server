@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<%- include('head') %>
+</head>
+<body>
+	<%- include('header') %>
+	<div class="content container addmod-content">
+		<h2 class="display-2">Manage User Bans</h2><br />
+			<form method="POST">
+				<div class="form-submit-uri">
+					<input type="text" class="addmod-input" autocomplete="off" name="victim" placeholder="User"/>
+					<input type="hidden" name="act" value="ban" />
+					<input type="submit" class="btn btn-warning" style="height:32px" value="Ban"/>
+				</div>
+			</form>
+			<div class="bans">
+				<% for(var x of bans){ %>
+					<div class="banned-user">
+						<b><%= x %></b>
+						<form method="POST">
+							<input type="hidden" name="victim" value="<%= x %>" />
+							<input type="hidden" name="act" value="unban" />
+							<input type="submit" class="btn btn-primary" value="Unban"/>
+						</form>
+					</div>
+				<% } %>
+			</div>
+	</div>
+	<%- include('footer') %>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<%- include('head') %>
+<script src="./public/knockout-3.5.0rc.js"></script>
+<script src="./public/knockout.mapping-latest.js"></script>
+<script>
+	const modData = <%- JSON.stringify(mods) %>;
+</script>
+<script src="./public/modslist.js"></script>
+</head>
+<body>
+	<%- include('header') %>
+	<div class="content container content-modslist">
+		<center class="display-2">PAMM Mods List</center>
+		<div style="display:flex;justify-content:center;">
+			<input type="text" class="titan-input" data-bind="textInput:searchString"/>
+			<select data-bind="options:searchCategories,optionsText:'display',value:searchKey,optionsValue:'name'" class="titan-input-select"></select>
+		</div>
+		<div class="mod-list" data-bind="foreach:sortedData">
+			<div class="mod">
+				<div class="mod-info">
+					<div class="mod-text">
+						<b data-bind="text:display_name"></b>
+						<i data-bind="text:author"></i>
+						<div class="mod-text-row">
+							<span data-bind="text:context"></span>
+							<span>ver. <span data-bind="text:version"></span></span>
+							<span>build <span data-bind="text:build"></span></span>
+							<span data-bind="text:date"></span>
+							<a data-bind="attr:{href:forum}" target="_blank">Forum</a>
+							<!-- ko if:website -->
+								<a data-bind="attr:{href:website}" target="_blank">Site</a>
+							<!-- /ko -->
+							<% if(isAdmin && am){ %>
+								<span>Owner: <span data-bind="text:owner"></span></span>
+							<% } %>
+						</div>
+						<span data-bind="text:description"></span>
+					</div>
+					<div class="mod-image">
+						<!-- ko if: icon -->
+						<img data-bind="attr:{src:icon}" />
+						<!-- /ko -->
+					</div>
+				</div>
+				<% if(isAdmin && am){ %>
+				<div class="button-bank">
+					<form action="./deleteMod" method="POST">
+						<input type="hidden" name="identifier" data-bind="attr:{value:identifier}" />
+						<input type="submit" class="btn btn-danger" value="KILL MOD"/>
+					</form>
+					<form action="./setModStatus" method="POST">
+						<input type="hidden" name="identifier" data-bind="attr:{value:identifier}" />
+						<!-- ko if: enabled -->
+							<input type="submit" class="btn btn-danger" value="DISABLE"/>
+							<input type="hidden" name="status" value="0" />
+						<!-- /ko -->
+						<!-- ko if: !enabled() -->
+							<input type="submit" class="btn btn-success" value="ENABLE"/>
+							<input type="hidden" name="status" value="1" />
+						<!-- /ko -->
+					</form>
+					<form action="./transferOwnership" method="POST">
+						<input type="hidden" name="identifier" data-bind="attr:{value:identifier}" />
+						<div class="form-submit-uri">
+							<input type="text" name="newUser" placeholder="New Owner" style="height:36px;" autocomplete="off"/>
+							<input type="submit" class="btn btn-warning" value="TRANSFER OWNERSHIP"/>
+						</div>
+					</form>
+				</div>
+				<% } %>
+			</div>
+		</div>
+	</div>
+	<%- include('footer') %>
+</body>
+</html>

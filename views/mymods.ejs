@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<%- include('head') %>
+</head>
+<body>
+	<%- include('header') %>
+	<div class="content container content-modslist">
+		<center class="display-2">Your Mods</center>
+		<div class="mod-list">
+			<% for(let mod of mods){ %>
+			<div class="mod">
+				<div class="mod-info">
+					<div class="mod-text">
+						<b><%= mod.display_name %></b>
+						<div class="mod-text-row">
+							<span><%= mod.context %></span>
+							<span>ver. <%= mod.version %></span>
+							<span>build <%= mod.build %></span>
+							<span><%= mod.date %></span>
+							<a href="<%= mod.forum %>" target="_blank">Forum</a>
+							<% if(mod.website){ %>
+								<a href="<%= mod.website %>" target="_blank">Site</a>
+							<% } %>
+						</div>
+						<span><%= mod.description %></span>
+					</div>
+					<div class="mod-image">
+						<% if(mod.icon){ %>
+							<img src="<%= mod.icon %>" />
+						<% } %>
+					</div>
+				</div>
+				<div class="button-bank">
+					<form action="./setModStatus" method="POST">
+						<input type="hidden" name="identifier" value="<%=mod.identifier%>" />
+						<% if(mod.enabled){ %>
+							<input type="submit" class="btn btn-danger" value="DISABLE"/>
+							<input type="hidden" name="status" value="0" />
+						<% }else{ %>
+							<input type="submit" class="btn btn-success" value="ENABLE"/>
+							<input type="hidden" name="status" value="1" />
+						<% } %>
+					</form>
+				</div>
+			</div>
+			<% } %>
+		</div>
+	</div>
+	<%- include('footer') %>
+</body>
+</html>
