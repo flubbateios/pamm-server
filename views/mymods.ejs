@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-<%- include('head') %>
+	<title>Your Mods</title>
+	<%- include('head') %>
 </head>
 <body>
 	<%- include('header') %>
@@ -13,6 +14,7 @@
 				<div class="mod-info">
 					<div class="mod-text">
 						<b><%= mod.display_name %></b>
+						<i><%= mod.author %></i>
 						<div class="mod-text-row">
 							<span><%= mod.context %></span>
 							<span>ver. <%= mod.version %></span>

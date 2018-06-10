@@ -1,20 +1,30 @@
 <!doctype html>
 <html lang="en">
 <head>
-<%- include('head') %>
+	<% if(am){ %>
+		<title>Manage Mods</title>
+	<% }else{ %>
+		<title>Mod List</title>
+	<% } %>
+	<%- include('head') %>
 <script src="./public/knockout-3.5.0rc.js"></script>
 <script src="./public/knockout.mapping-latest.js"></script>
 <script>
 	const modData = <%- JSON.stringify(mods) %>;
 </script>
 <script src="./public/modslist.js"></script>
+<% if(am){ %>
+<script>
+	model.searchCategories.push({display:ko.observable('Owner'),name:ko.observable('owner')});
+</script>
+<% } %>
 </head>
 <body>
 	<%- include('header') %>
 	<div class="content container content-modslist">
 		<center class="display-2">PAMM Mods List</center>
 		<div style="display:flex;justify-content:center;">
-			<input type="text" class="titan-input" data-bind="textInput:searchString"/>
+			<input type="text" class="titan-input" data-bind="value:searchString"/>
 			<select data-bind="options:searchCategories,optionsText:'display',value:searchKey,optionsValue:'name'" class="titan-input-select"></select>
 		</div>
 		<div class="mod-list" data-bind="foreach:sortedData">
@@ -34,6 +44,7 @@
 							<!-- /ko -->
 							<% if(isAdmin && am){ %>
 								<span>Owner: <span data-bind="text:owner"></span></span>
+								<a data-bind="attr:{href:url}" target="_blank">Download</a>
 							<% } %>
 						</div>
 						<span data-bind="text:description"></span>

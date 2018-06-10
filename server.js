@@ -41,7 +41,7 @@ const validateMod = (m) => {
 			date: {
 				type: 'string',
 				required: true,
-				pattern: /[0-9]{4}(-|\/)[0-9]{2}(-|\/)[0-9]{2}/
+				pattern:/^\d{4}[\-\/\s]?((((0[13578])|(1[02]))[\-\/\s]?(([0-2][0-9])|(3[01])))|(((0[469])|(11))[\-\/\s]?(([0-2][0-9])|(30)))|(02[\-\/\s]?[0-2][0-9]))$/
 			},
 			description: {
 				type: 'string',
@@ -111,7 +111,7 @@ const log = (r) => {
 const COOKIE_PARAMS_USERV = {
 	httpOnly: true,
 	maxAge: 14 * 24 * 60 * 60 * 1000,
-	//secure: true, //Set to false for testing
+	secure: true, //Set to false for testing
 	signed: true
 };
 module.exports = class PammServer {
@@ -163,7 +163,7 @@ module.exports = class PammServer {
 			}
 			if (this.bans.includes(res.locals.gUser.toLowerCase())) {
 				res.render('error', {
-					error: 'YOU ARE BANNED!'
+					error: 'Due to your account privileges and GDPR laws, this webpage is no longer available to you.'
 				});
 				res.clearCookie('userv', COOKIE_PARAMS_USERV);
 				return;
@@ -206,8 +206,8 @@ module.exports = class PammServer {
 			q = await modinfo.async("string");
 			q = JSON.parse(q);
 			q.url = uri;
-			q.priority = q.priority || 100;
-			q.icon = q.icon || 'https://flubbateios.com/files/pamm_def.png';
+			q.priority = parseInt(q.priority) || 100;
+			q.build = q.build.toString();
 			q.author = q.authors ? q.authors.join(', ') : q.author;
 		} catch (e) {
 			throw 'bad_modinfo';
@@ -223,13 +223,9 @@ module.exports = class PammServer {
 		return this.db.collection('mods').insertOne(mod);
 	}
 	updateModInDb(mod) {
-		delete mod.owner;
-		const query = {
-			$set: mod
-		};
-		return this.db.collection('mods').updateOne({
+		return this.db.collection('mods').replaceOne({
 			identifier: mod.identifier
-		}, query);
+		}, mod);
 	}
 	async importFromFile(file) {
 		const adminUsername = this.config.owner;
@@ -240,9 +236,16 @@ module.exports = class PammServer {
 				log(`Attempting to migrate ${x}`);
 				try {
 					let y = await this.processZip(x);
+					y.forum = y.forum || 'http://forums.uberent.com/';
+					y.date = y.date || '';
+					y.signature = y.signature || 'not yet implemented';
+					y.build = y.build || '0';
+					y.category = y.category || [];
+					let tested = validateMod(y);
+					(tested === true) || log(tested);
 					y.owner = adminUsername;
 					y.enabled = true;
-					this.addModToDb(y);
+					await this.addModToDb(y);
 				} catch (e) {
 					log(`${x} FAILED ${e}`)
 				}
@@ -266,7 +269,8 @@ module.exports = class PammServer {
 		}
 		if (exists) {
 			if (user === exists.owner || this.admins.includes(user)) {
-				delete mod.enabled;
+				mod.owner = exists.owner;
+				mod.enabled = exists.enabled;
 				this.updateModInDb(mod);
 				log(`Updated mod ${mod.identifier} in DB (${exists.owner})`);
 				return 'UPDATED MOD';
@@ -299,7 +303,7 @@ module.exports = class PammServer {
 			const cookieParams = {
 				httpOnly: true,
 				maxAge: 4 * 60 * 1000,
-				//secure: true,
+				secure: true,
 				signed: true
 			};
 			const state = randomBytes(32).toString('hex');
@@ -620,13 +624,13 @@ module.exports = class PammServer {
 	//INIT FUNCTIONS
 	async initDb() {
 		const url = this.config.dbAuth ?
-			`mongodb://${encodeURIComponent(this.config.dbUser)}:${encodeURIComponent(this.config.dbPassword)}@${this.dbHost}:${this.dbPort}/${this.db}?authMechanism=DEFAULT&authSource=admin` :
+			`mongodb://${encodeURIComponent(this.config.dbUser)}:${encodeURIComponent(this.config.dbPassword)}@${this.config.dbHost}:${this.config.dbPort}/${this.config.db}?authMechanism=DEFAULT&authSource=admin` :
 			`mongodb://${this.config.dbHost}:${this.config.dbPort}/${this.db}`;
 		let a;
 		try {
 			a = await MongoClient.connect(url);
 		} catch (e) {
-			log('Failed to connect to database. Exiting.')
+			log('Failed to connect to database. Exiting.');
 		}
 		this.db = a.db(this.config.db);
 		log('Connected to database.');
